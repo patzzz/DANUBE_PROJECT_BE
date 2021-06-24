@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DecodeJwtService {
-
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
@@ -23,7 +22,6 @@ public class DecodeJwtService {
         String username = jwtTokenUtil.getAllClaimsFromToken(jwtPrincipal.getJwtToken()).get("sub").toString();
         JwtAuthorities s = g.fromJson(json, JwtAuthorities.class);
         s.setUsername(username);
-
         return s;
     }
 }

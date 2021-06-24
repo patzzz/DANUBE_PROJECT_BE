@@ -1,5 +1,12 @@
 package com.patzzzcode.DanubeProject.jwt.controller;
 
+import com.patzzzcode.DanubeProject.bo.User;
+import com.patzzzcode.DanubeProject.jwt.config.JwtTokenUtil;
+import com.patzzzcode.DanubeProject.jwt.model.JwtRequest;
+import com.patzzzcode.DanubeProject.jwt.model.JwtResponse;
+import com.patzzzcode.DanubeProject.jwt.service.JwtUserDetailsService;
+import com.patzzzcode.DanubeProject.repositories.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.patzzzcode.DanubeProject.bo.User;
-import com.patzzzcode.DanubeProject.jwt.config.JwtTokenUtil;
-import com.patzzzcode.DanubeProject.jwt.model.JwtRequest;
-import com.patzzzcode.DanubeProject.jwt.model.JwtResponse;
-import com.patzzzcode.DanubeProject.jwt.service.JwtUserDetailsService;
-import com.patzzzcode.DanubeProject.repositories.UserRepository;
-import com.patzzzcode.DanubeProject.service.UserService;
-
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(value = "/")
@@ -33,21 +32,25 @@ public class JwtAuthenticationController {
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
 	@Autowired
-	private UserService userService;
+	private com.patzzzcode.DanubeProject.service.UserService userService;
 	@Autowired
 	private UserRepository userRepository;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+
 		final String token = jwtTokenUtil.generateToken(userDetails);
+
 		return ResponseEntity.ok(new JwtResponse(token));
+
 	}
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public ResponseEntity<?> register(@RequestBody User user) throws Exception {
-		User existingUserName = userRepository.findByEmail(user.getUsername()).orElse(null);
+		User existingUserName = userRepository.findByUsername(user.getUsername()).orElse(null);
 		if (existingUserName != null) {
 			return new ResponseEntity<>("User allready exist", HttpStatus.BAD_REQUEST);
 		}
@@ -55,8 +58,9 @@ public class JwtAuthenticationController {
 		if (existingUserEmail != null) {
 			return new ResponseEntity<>("Email allready used", HttpStatus.BAD_REQUEST);
 		}
-		return ResponseEntity.ok(userService.createUser(user));
-
+		else {
+			return ResponseEntity.ok(userService.createUser(user));
+		}
 	}
 
 	private void authenticate(String username, String password) throws Exception {

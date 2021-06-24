@@ -1,7 +1,11 @@
 package com.patzzzcode.DanubeProject.jwt.model;
 
+
+
 import java.security.Principal;
 import java.util.Map;
+
+
 
 public class JwtPrincipal extends DecodedJwt implements Principal {
 
@@ -21,4 +25,5 @@ public class JwtPrincipal extends DecodedJwt implements Principal {
         return jwtToken;
     }
 
+    
 }

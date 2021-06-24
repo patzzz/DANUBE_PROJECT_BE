@@ -3,7 +3,9 @@ package com.patzzzcode.DanubeProject.jwt.config;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import com.patzzzcode.DanubeProject.bo.User;
@@ -20,14 +22,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-	@Autowired
-	private UserRepository userRepository;
-
 	private static final long serialVersionUID = -2550185165626007488L;
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
 	@Value("${jwt.secret}")
 	private String secret;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	// retrieve username from jwt token
 	public String getUsernameFromToken(String token) {
@@ -58,7 +60,7 @@ public class JwtTokenUtil implements Serializable {
 	// generate token for user
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
-		User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+		User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
 		claims.put("userId", user.getId());
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
